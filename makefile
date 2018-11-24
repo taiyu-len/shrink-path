@@ -8,6 +8,6 @@ clean:
 
 install: shrink-path
 	@echo :: installing 'shrink-path' to $(PREFIX)/bin/
-	sudo install -m 755 shrink-path $(PREFIX)/bin/shrink-path
+	install -m 755 shrink-path $(PREFIX)/bin/shrink-path
 
 .PHONY: clean install

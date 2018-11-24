@@ -1,13 +1,13 @@
 CFLAGS=-Wall -Wextra -Os
 PREFIX?=/usr/local
 
-shrink-file: shrink-file.o
+shrink-path: shrink-path.c
 
 clean:
-	rm shrink-file.o shrink-file
+	rm shrink-path.o shrink-path
 
 install: shrink-file
-	@echo :: installing 'shrink-file' to $(PREFIX)/bin/
-	sudo install -m 755 shrink-file $(PREFIX)/bin/shrink-file
+	@echo :: installing 'shrink-path' to $(PREFIX)/bin/
+	sudo install -m 755 shrink-path $(PREFIX)/bin/shrink-path
 
 .PHONY: clean install

@@ -1,20 +1,38 @@
-#include <unistd.h>
+#include <unistd.h> // read, write, _exit
+#include <limits.h> // NAME_MAX
+#include <errno.h>  // errno
+#include <string.h> // strchr
+
+static char *shrink_path(char *path);
+static char *read_str(void);
+static void write_str(char *begin, char *end);
+static void write_errno(int value);
+
 int main(int argc, char **argv) {
-
-	if (argc != 2) {
-		return 1;
+	char *path;
+	char *last;
+	if (argc == 1) {
+		path = read_str();
+	} else {
+		path = argv[1];
 	}
+	last = shrink_path(path);
+	write_str(path, last);
+	return 0;
+}
 
-	char *path = argv[1];
+char *shrink_path(char * const path) {
 	char *src = path;
-
+	char *tgt;
+	char *rec;
+	int len, dot;
 	// skip to first '/'
 	while (*src && *src != '/') {
 		++src;
 	}
 
-	int len, dot;
-	char *tgt = src, *rec = src;
+	tgt = rec = src;
+	len = dot = 0;
 	while (*src) {
 		// either reset length at start of new subdir,
 		// or increase length for each letter in subdir.
@@ -37,6 +55,7 @@ int main(int argc, char **argv) {
 		}
 		++src;
 	}
+
 	// move rest of last directory onto target.
 	//    tgt v     v rec
 	// ~/f/b/s????/subdir
@@ -45,12 +64,43 @@ int main(int argc, char **argv) {
 		++tgt;
 		++rec;
 	}
+
 	// write final byte
 	*tgt = '\0';
-	do {
-		int written = write(STDOUT_FILENO, path, tgt-path);
-		if (written == -1) return 1;
-		path += written;
-	} while (tgt - path);
-	return 0;
+
+	// returns end of new string
+	return tgt;
+}
+
+char *read_str(void) {
+	static char buffer[NAME_MAX + 1];
+	char *last;
+	int bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer));
+	if (bytes_read == -1) {
+		write_errno(errno);
+		_exit(1);
+	}
+	buffer[bytes_read] = '\0';
+	last = strchr(buffer, '\n');
+	if (last) {
+		*last = '\0';
+	}
+	return buffer;
+}
+
+void write_str(char *first, char *last) {
+	while (first != last) {
+		int written = write(STDOUT_FILENO, first, last-first);
+		if (written == -1) {
+			write_errno(errno);
+			_exit(1);
+		}
+		first += written;
+	};
+}
+
+void write_errno(int value) {
+	char *err = strerror(value);
+	char *end = err + strlen(err);
+	write(STDERR_FILENO, err, end-err);
 }

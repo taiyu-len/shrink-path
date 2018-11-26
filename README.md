@@ -1,4 +1,4 @@
-Shrinks path given by first argument.
+Shrinks paths of first argument or first line
 
 ### Usage
 ```

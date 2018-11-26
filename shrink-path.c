@@ -1,5 +1,5 @@
 #include <unistd.h> // read, write, _exit
-#include <limits.h> // NAME_MAX
+#include <limits.h> // PATH_MAX
 #include <errno.h>  // errno
 #include <string.h> // strchr
 
@@ -73,9 +73,9 @@ char *shrink_path(char * const path) {
 }
 
 char *read_str(void) {
-	static char buffer[NAME_MAX + 1];
+	static char buffer[PATH_MAX + 1];
 	char *last;
-	int bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer));
+	int bytes_read = read(STDIN_FILENO, buffer, PATH_MAX);
 	if (bytes_read == -1) {
 		write_errno(errno);
 		_exit(1);

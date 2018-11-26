@@ -4,7 +4,7 @@ PREFIX?=/usr/local
 shrink-path: shrink-path.c
 
 clean:
-	rm shrink-path.o shrink-path
+	rm shrink-path
 
 install: shrink-path
 	@echo :: installing 'shrink-path' to $(PREFIX)/bin/
